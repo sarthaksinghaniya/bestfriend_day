@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import AudioSystem from './AudioSystem';
+import AudioSystem, { MusicToggleButton } from './AudioSystem';
 
 const steps = [
   { label: 'NameInput', path: '/' },
@@ -28,6 +28,10 @@ export default function AppShell() {
         <div className="absolute left-[-10%] top-[-10%] h-72 w-72 rounded-full bg-fuchsia-300/40 blur-3xl" />
         <div className="absolute right-[-8%] top-[10%] h-80 w-80 rounded-full bg-pink-200/50 blur-3xl" />
         <div className="absolute bottom-[-15%] left-[20%] h-96 w-96 rounded-full bg-violet-200/40 blur-3xl" />
+      </div>
+
+      <div className="fixed right-4 top-4 z-30">
+        <MusicToggleButton />
       </div>
 
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-5xl flex-col gap-5">
