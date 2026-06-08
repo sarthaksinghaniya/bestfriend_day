@@ -13,7 +13,7 @@ const steps = [
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const showNav = location.pathname !== '/';
+  const showNav = location.pathname !== '/' && location.pathname !== '/pause';
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 py-6 sm:px-6 lg:px-8">

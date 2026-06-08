@@ -35,6 +35,17 @@ body {
   animation: gradient-shift 14s ease-in-out infinite;
 }
 
+.pause-gradient {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.88), rgba(24, 14, 39, 0.84), rgba(63, 31, 92, 0.78), rgba(13, 13, 18, 0.9));
+  background-size: 300% 300%;
+  animation: pause-shift 20s ease-in-out infinite;
+}
+
+.heartbeat-pulse {
+  animation: heartbeat-pulse 4.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
 @keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
@@ -44,6 +55,37 @@ body {
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes pause-shift {
+  0% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  100% {
+    background-position: 0% 40%;
+  }
+}
+
+@keyframes heartbeat-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  18% {
+    transform: scale(1.012);
+  }
+  34% {
+    transform: scale(1);
+  }
+  52% {
+    transform: scale(1.01);
+  }
+  68% {
+    transform: scale(1);
   }
 }
 
