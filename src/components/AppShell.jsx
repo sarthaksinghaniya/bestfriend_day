@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import AudioSystem from './AudioSystem';
 
 const steps = [
   { label: 'NameInput', path: '/' },
@@ -21,6 +22,8 @@ export default function AppShell() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 py-6 sm:px-6 lg:px-8">
+      <AudioSystem />
+
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-[-10%] top-[-10%] h-72 w-72 rounded-full bg-fuchsia-300/40 blur-3xl" />
         <div className="absolute right-[-8%] top-[10%] h-80 w-80 rounded-full bg-pink-200/50 blur-3xl" />
