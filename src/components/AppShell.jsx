@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Suspense } from 'react';
 import AudioSystem, { MusicToggleButton } from './AudioSystem';
 
 const steps = [
@@ -68,7 +69,15 @@ export default function AppShell() {
               transition={{ duration: 0.38, ease: 'easeOut' }}
               className="w-full"
             >
-              <Outlet />
+              <Suspense
+                fallback={
+                  <div className="flex w-full items-center justify-center py-24 text-sm text-[#6f5a88]">
+                    Loading...
+                  </div>
+                }
+              >
+                <Outlet />
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>

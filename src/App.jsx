@@ -1,12 +1,14 @@
+import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import NameInput from './pages/NameInput';
-import Landing from './pages/Landing';
-import BestFriendLetter from './pages/BestFriendLetter';
-import QuestionsFlow from './pages/QuestionsFlow';
-import PauseScreen from './pages/PauseScreen';
-import Letter from './pages/Letter';
-import FinalScreen from './pages/FinalScreen';
 import AppShell from './components/AppShell';
+
+const NameInput = lazy(() => import('./pages/NameInput'));
+const Landing = lazy(() => import('./pages/Landing'));
+const BestFriendLetter = lazy(() => import('./pages/BestFriendLetter'));
+const QuestionsFlow = lazy(() => import('./pages/QuestionsFlow'));
+const PauseScreen = lazy(() => import('./pages/PauseScreen'));
+const Letter = lazy(() => import('./pages/Letter'));
+const FinalScreen = lazy(() => import('./pages/FinalScreen'));
 
 export default function App() {
   return (
