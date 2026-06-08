@@ -4,10 +4,11 @@ import { motion } from 'framer-motion';
 const steps = [
   { label: 'NameInput', path: '/' },
   { label: 'Landing', path: '/start' },
+  { label: 'BestFriendLetter', path: '/wish' },
   { label: 'QuestionsFlow', path: '/questions' },
   { label: 'PauseScreen', path: '/pause' },
   { label: 'Letter', path: '/letter' },
-  { label: 'NicknameReveal', path: '/final' },
+  { label: 'FinalScreen', path: '/final' },
 ];
 
 export default function AppShell() {
