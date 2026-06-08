@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAnswers } from '../context/AnswersContext';
 
 const questions = [
   {
@@ -30,9 +31,9 @@ const finalDelay = 1000;
 
 export default function QuestionsFlow() {
   const navigate = useNavigate();
+  const { addAnswer } = useAnswers();
   const timeoutRef = useRef(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -55,7 +56,7 @@ export default function QuestionsFlow() {
 
     setIsTransitioning(true);
     setSelectedAnswer(option);
-    setAnswers((currentAnswers) => [...currentAnswers, option]);
+    addAnswer(question.text, option);
 
     timeoutRef.current = window.setTimeout(() => {
       if (isLastQuestion) {
@@ -148,10 +149,6 @@ export default function QuestionsFlow() {
               </div>
             </motion.div>
           </AnimatePresence>
-
-          <p className="mt-6 text-center text-xs text-[#8c7fa3]">
-            Saved answers: {answers.length}
-          </p>
         </div>
       </section>
     </main>
