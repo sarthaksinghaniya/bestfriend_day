@@ -87,7 +87,12 @@ export default function NicknameReveal() {
         scale: Math.min(window.devicePixelRatio || 1, 2),
         useCORS: true,
         onclone: (document) => {
+          const container = document.querySelector('[data-capture-container="true"]');
           const target = document.querySelector('[data-capture-card="true"]');
+
+          if (container) {
+            container.style.boxShadow = '0 0 0 1px rgba(255, 255, 255, 0.95), 0 18px 60px rgba(86, 58, 126, 0.12)';
+          }
 
           if (target) {
             target.style.boxShadow = '0 0 0 2px rgba(255, 255, 255, 0.92), 0 18px 60px rgba(86, 58, 126, 0.14)';
@@ -159,80 +164,85 @@ export default function NicknameReveal() {
 
         <div
           ref={captureRef}
-          data-capture-card="true"
-          className="relative mx-auto mt-10 overflow-hidden rounded-[2rem] border border-white/85 bg-[#fffafc]/90 p-6 shadow-[0_18px_60px_rgba(86,58,126,0.14)] backdrop-blur-2xl sm:p-8"
+          data-capture-container="true"
+          className="mx-auto mt-10 max-w-xl rounded-[2rem] bg-[#fff7fb] p-4 shadow-[0_18px_60px_rgba(86,58,126,0.12)] sm:p-5"
         >
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.42),transparent_35%,rgba(255,255,255,0.16)_60%,transparent)] opacity-70" />
+          <div
+            data-capture-card="true"
+            className="relative overflow-hidden rounded-[2rem] border border-white/85 bg-[#fffafc]/90 p-6 shadow-[0_18px_60px_rgba(86,58,126,0.14)] backdrop-blur-2xl sm:p-8"
+          >
+            <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.42),transparent_35%,rgba(255,255,255,0.16)_60%,transparent)] opacity-70" />
 
-          <div className="relative z-10 min-h-[10rem]">
-            <AnimatePresence mode="wait">
-              {hasRevealed ? (
-                <motion.div
-                  key={nickname}
-                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className="flex h-full flex-col items-center justify-center"
-                >
-                  <p className="text-xs uppercase tracking-[0.38em] text-[#a286c0]">
-                    You are my
-                  </p>
-                  <p className="mt-4 text-4xl font-semibold tracking-tight text-[#29183f] sm:text-5xl">
-                    {nickname}
-                  </p>
-                  <p className="mt-5 text-sm leading-6 text-[#5f5870]">
-                    Send me a screenshot of this 👀
-                  </p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="reveal-prompt"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
-                  className="flex h-full min-h-[10rem] flex-col items-center justify-center"
-                >
-                  <p className="text-sm leading-6 text-[#5f5870]">{message}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {hasRevealed && answers.length > 0 ? (
-            <motion.div
-              key="answer-summary"
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
-              className="mx-auto mt-8 max-w-xl rounded-[1.5rem] border border-white/80 bg-white/55 p-5 text-left shadow-[0_16px_50px_rgba(86,58,126,0.12)] backdrop-blur-xl sm:p-6"
-            >
-              <h2 className="text-center text-2xl font-semibold tracking-tight text-[#29183f] sm:text-3xl">
-                Can I see this again…?
-              </h2>
-
-              <div className="mt-5 space-y-4">
-                {answers.map((item, index) => (
-                  <div
-                    key={`${item.question}-${index}`}
-                    className="rounded-2xl border border-[#eadff4] bg-[#fffafc]/80 px-4 py-4 shadow-[0_10px_28px_rgba(86,58,126,0.08)]"
+            <div className="relative z-10 min-h-[10rem]">
+              <AnimatePresence mode="wait">
+                {hasRevealed ? (
+                  <motion.div
+                    key={nickname}
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="flex h-full flex-col items-center justify-center"
                   >
-                    <p className="text-sm font-medium leading-6 text-[#35264d]">
-                      {item.question}
+                    <p className="text-xs uppercase tracking-[0.38em] text-[#a286c0]">
+                      You are my
                     </p>
-                    <p className="mt-3 border-l-2 border-[#c79adb] pl-3 text-sm leading-6 text-[#7a5a92]">
-                      → {item.answer}
+                    <p className="mt-4 text-4xl font-semibold tracking-tight text-[#29183f] sm:text-5xl">
+                      {nickname}
                     </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+                    <p className="mt-5 text-sm leading-6 text-[#5f5870]">
+                      Send me a screenshot of this 👀
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="reveal-prompt"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35 }}
+                    className="flex h-full min-h-[10rem] flex-col items-center justify-center"
+                  >
+                    <p className="text-sm leading-6 text-[#5f5870]">{message}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {hasRevealed && answers.length > 0 ? (
+              <motion.div
+                key="answer-summary"
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+                className="mt-5 rounded-[1.5rem] border border-white/80 bg-white/70 p-5 text-left shadow-[0_16px_50px_rgba(86,58,126,0.12)] backdrop-blur-xl sm:p-6"
+              >
+                <h2 className="text-center text-2xl font-semibold tracking-tight text-[#29183f] sm:text-3xl">
+                  Can I see this again…?
+                </h2>
+
+                <div className="mt-5 space-y-4">
+                  {answers.map((item, index) => (
+                    <div
+                      key={`${item.question}-${index}`}
+                      className="rounded-2xl border border-[#eadff4] bg-[#fffafc]/80 px-4 py-4 shadow-[0_10px_28px_rgba(86,58,126,0.08)]"
+                    >
+                      <p className="text-sm font-medium leading-6 text-[#35264d]">
+                        {item.question}
+                      </p>
+                      <p className="mt-3 border-l-2 border-[#c79adb] pl-3 text-sm leading-6 text-[#7a5a92]">
+                        → {item.answer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           {!hasRevealed ? (
@@ -269,7 +279,7 @@ export default function NicknameReveal() {
               disabled={isCapturing}
               className="inline-flex items-center justify-center rounded-full border border-[#dbcbed] bg-white/75 px-6 py-3 text-sm font-medium text-[#3a3250] transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-wait disabled:opacity-60"
             >
-              {isCapturing ? 'Saving...' : 'Save this'}
+              {isCapturing ? 'Saving...' : 'Save & send this 👀'}
             </button>
           </div>
         ) : null}
