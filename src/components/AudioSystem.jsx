@@ -4,8 +4,11 @@ const musicPath = '/assets/Music.mp3';
 let musicAudio = null;
 let musicStarted = false;
 let musicMuted = false;
+let tabIsHidden = false;
 let fadeAnimationFrame = null;
 const musicStateEventName = 'music-state-change';
+const musicDuckVolume = 0.25;
+const musicTargetVolume = 0.6;
 
 function ensureMusicAudio() {
   if (!musicAudio) {
@@ -63,15 +66,28 @@ function fadeVolume(audio, fromVolume, toVolume, duration, onComplete) {
 }
 
 function fadeInMusic(audio) {
-  const targetVolume = 0.6;
   audio.volume = 0;
-  fadeVolume(audio, 0, targetVolume, 2400);
+  fadeVolume(audio, 0, musicTargetVolume, 2400);
 }
 
 function fadeOutMusic(audio) {
   fadeVolume(audio, audio.volume, 0, 700, () => {
     audio.pause();
   });
+}
+
+function applyVisibilityVolume(audio) {
+  if (!musicStarted || musicMuted || audio.paused) {
+    return;
+  }
+
+  stopFadeAnimation();
+
+  const nextVolume = tabIsHidden ? musicDuckVolume : musicTargetVolume;
+  const startVolume = audio.volume;
+  const fadeDuration = tabIsHidden ? 400 : 600;
+
+  fadeVolume(audio, startVolume, nextVolume, fadeDuration);
 }
 
 export function startMusic() {
@@ -128,9 +144,18 @@ export function isMusicStarted() {
 
 export default function AudioSystem() {
   useEffect(() => {
-    ensureMusicAudio();
+    const audio = ensureMusicAudio();
+
+    function handleVisibilityChange() {
+      tabIsHidden = document.visibilityState !== 'visible';
+      applyVisibilityVolume(audio);
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    handleVisibilityChange();
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       stopFadeAnimation();
 
       if (musicAudio) {
