@@ -41,8 +41,6 @@ export default function NicknameReveal() {
   const [hasRevealed, setHasRevealed] = useState(false);
   const [confetti, setConfetti] = useState([]);
   const [isCapturing, setIsCapturing] = useState(false);
-  const canShareScreenshot =
-    typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator;
 
   const message = useMemo(() => {
     if (!nickname) {
@@ -83,9 +81,16 @@ export default function NicknameReveal() {
     try {
       const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(captureRef.current, {
-        backgroundColor: null,
+        backgroundColor: '#ffffff',
         scale: Math.min(window.devicePixelRatio || 1, 2),
         useCORS: true,
+        onclone: (document) => {
+          const target = document.querySelector('[data-capture-card="true"]');
+
+          if (target) {
+            target.style.boxShadow = '0 0 0 2px rgba(255, 255, 255, 0.92), 0 18px 60px rgba(86, 58, 126, 0.14)';
+          }
+        },
       });
 
       const imageUrl = canvas.toDataURL('image/png');
@@ -98,55 +103,8 @@ export default function NicknameReveal() {
     }
   }
 
-  async function shareScreenshot() {
-    if (!captureRef.current || !canShareScreenshot || isCapturing) {
-      return;
-    }
-
-    setIsCapturing(true);
-
-    try {
-      const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(captureRef.current, {
-        backgroundColor: null,
-        scale: Math.min(window.devicePixelRatio || 1, 2),
-        useCORS: true,
-      });
-
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-
-      if (!blob) {
-        return;
-      }
-
-      const file = new File(
-        [blob],
-        `nickname-reveal-${nickname || 'screenshot'}.png`,
-        { type: 'image/png' },
-      );
-
-      if (!navigator.canShare({ files: [file] })) {
-        const imageUrl = canvas.toDataURL('image/png');
-        const downloadLink = document.createElement('a');
-        downloadLink.href = imageUrl;
-        downloadLink.download = `nickname-reveal-${nickname || 'screenshot'}.png`;
-        downloadLink.click();
-        return;
-      }
-
-      await navigator.share({
-        title: 'Nickname reveal',
-        text: 'Send me a screenshot of this 👀',
-        files: [file],
-      });
-    } finally {
-      setIsCapturing(false);
-    }
-  }
-
   return (
     <section
-      ref={captureRef}
       className="relative flex w-full max-w-4xl items-center justify-center overflow-hidden rounded-[2rem] border border-white/60 bg-white/22 px-5 py-12 shadow-[0_24px_80px_rgba(86,58,126,0.18)] backdrop-blur-2xl sm:px-8 sm:py-16"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(225,194,255,0.34),transparent_30%)]" />
@@ -197,7 +155,11 @@ export default function NicknameReveal() {
           Tap to reveal a playful nickname, then let the confetti do the dramatic part.
         </p>
 
-        <div className="relative mx-auto mt-10 overflow-hidden rounded-[2rem] border border-white/75 bg-[#fffafc]/75 p-6 shadow-[0_18px_60px_rgba(86,58,126,0.14)] backdrop-blur-2xl sm:p-8">
+        <div
+          ref={captureRef}
+          data-capture-card="true"
+          className="relative mx-auto mt-10 overflow-hidden rounded-[2rem] border border-white/85 bg-[#fffafc]/90 p-6 shadow-[0_18px_60px_rgba(86,58,126,0.14)] backdrop-blur-2xl sm:p-8"
+        >
           <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.42),transparent_35%,rgba(255,255,255,0.16)_60%,transparent)] opacity-70" />
 
           <div className="relative z-10 min-h-[10rem]">
@@ -272,18 +234,8 @@ export default function NicknameReveal() {
               disabled={isCapturing}
               className="inline-flex items-center justify-center rounded-full border border-[#dbcbed] bg-white/75 px-6 py-3 text-sm font-medium text-[#3a3250] transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-wait disabled:opacity-60"
             >
-              {isCapturing ? 'Capturing...' : 'Download screenshot'}
+              {isCapturing ? 'Saving...' : 'Save this'}
             </button>
-            {canShareScreenshot ? (
-              <button
-                type="button"
-                onClick={shareScreenshot}
-                disabled={isCapturing}
-                className="inline-flex items-center justify-center rounded-full border border-[#dbcbed] bg-white/75 px-6 py-3 text-sm font-medium text-[#3a3250] transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-wait disabled:opacity-60"
-              >
-                Share screenshot
-              </button>
-            ) : null}
           </div>
         ) : null}
       </motion.div>

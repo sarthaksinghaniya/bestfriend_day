@@ -59,6 +59,12 @@ export default function AppShell() {
           <Outlet />
         </motion.section>
       </div>
+
+      <div className="pointer-events-none fixed bottom-4 left-1/2 z-20 -translate-x-1/2">
+        <div className="rounded-full border border-white/60 bg-white/45 px-4 py-2 text-center text-xs font-medium tracking-[0.3em] text-[#6f5a88] shadow-[0_12px_30px_rgba(106,74,160,0.1)] backdrop-blur-xl">
+          Happy Best Friend Day 🤍
+        </div>
+      </div>
     </main>
   );
 }
