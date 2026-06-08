@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
+import { useAnswers } from '../context/AnswersContext';
 
 const nicknames = [
   'Sunbeam',
@@ -36,6 +37,7 @@ function buildConfettiPieces() {
 }
 
 export default function NicknameReveal() {
+  const { answers } = useAnswers();
   const captureRef = useRef(null);
   const [nickname, setNickname] = useState('');
   const [hasRevealed, setHasRevealed] = useState(false);
@@ -198,6 +200,39 @@ export default function NicknameReveal() {
             </AnimatePresence>
           </div>
         </div>
+
+        <AnimatePresence>
+          {hasRevealed && answers.length > 0 ? (
+            <motion.div
+              key="answer-summary"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+              className="mx-auto mt-8 max-w-xl rounded-[1.5rem] border border-white/80 bg-white/55 p-5 text-left shadow-[0_16px_50px_rgba(86,58,126,0.12)] backdrop-blur-xl sm:p-6"
+            >
+              <h2 className="text-center text-2xl font-semibold tracking-tight text-[#29183f] sm:text-3xl">
+                Can I see this again…?
+              </h2>
+
+              <div className="mt-5 space-y-4">
+                {answers.map((item, index) => (
+                  <div
+                    key={`${item.question}-${index}`}
+                    className="rounded-2xl border border-[#eadff4] bg-[#fffafc]/80 px-4 py-4 shadow-[0_10px_28px_rgba(86,58,126,0.08)]"
+                  >
+                    <p className="text-sm font-medium leading-6 text-[#35264d]">
+                      {item.question}
+                    </p>
+                    <p className="mt-3 border-l-2 border-[#c79adb] pl-3 text-sm leading-6 text-[#7a5a92]">
+                      → {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           {!hasRevealed ? (
