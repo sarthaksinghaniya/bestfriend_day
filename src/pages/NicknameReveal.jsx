@@ -272,16 +272,28 @@ export default function NicknameReveal() {
         </div>
 
         {hasRevealed ? (
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={captureScreenshot}
-              disabled={isCapturing}
-              className="inline-flex items-center justify-center rounded-full border border-[#dbcbed] bg-white/75 px-6 py-3 text-sm font-medium text-[#3a3250] transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-wait disabled:opacity-60"
-            >
-              {isCapturing ? 'Saving...' : 'Save & send this 👀'}
-            </button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut', delay: 0.35 }}
+            className="mt-6 flex flex-col items-center justify-center gap-3"
+          >
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={captureScreenshot}
+                disabled={isCapturing}
+                className="inline-flex items-center justify-center rounded-full border border-[#dbcbed] bg-white/75 px-6 py-3 text-sm font-medium text-[#3a3250] transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-wait disabled:opacity-60"
+              >
+                {isCapturing ? 'Saving...' : 'Save & send this 👀'}
+              </button>
+            </div>
+
+            <div className="text-center text-xs leading-5 text-[#8c7fa3]">
+              <p>I’m kinda curious what you chose… 👀</p>
+              <p>Send it to me?</p>
+            </div>
+          </motion.div>
         ) : null}
       </motion.div>
     </section>
