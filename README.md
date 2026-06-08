@@ -16,11 +16,8 @@ A modern React web app built with Vite, Tailwind CSS, Framer Motion, and React R
 
 1. `Landing`
 2. `NameInput`
-3. `Timeline`
-4. `MemeSection`
-5. `MemorySection`
-6. `Letter`
-7. `NicknameReveal`
+3. `Letter`
+4. `NicknameReveal`
 
 ## Folder Structure
 

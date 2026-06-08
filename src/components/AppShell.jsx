@@ -4,9 +4,6 @@ import { motion } from 'framer-motion';
 const steps = [
   { label: 'Landing', path: '/' },
   { label: 'NameInput', path: '/name-input' },
-  { label: 'Timeline', path: '/timeline' },
-  { label: 'MemeSection', path: '/meme-section' },
-  { label: 'MemorySection', path: '/memory-section' },
   { label: 'Letter', path: '/letter' },
   { label: 'NicknameReveal', path: '/nickname-reveal' },
 ];
