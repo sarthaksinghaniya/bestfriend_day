@@ -3,51 +3,31 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageCard from '../components/PageCard';
 import PrimaryButton from '../components/PrimaryButton';
 import SecondaryButton from '../components/SecondaryButton';
+import cachedMemes from '../data/friendshipMemes.json';
 
-const memes = [
-  {
-    id: 1,
-    image:
-      'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=1200&q=80',
-    caption: 'This one felt way too accurate',
-    message: 'A tiny joke, but somehow it turned into a whole mood.',
-  },
-  {
-    id: 2,
-    image:
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
-    caption: 'Low effort. High emotional damage.',
-    message: 'The kind of meme that lands because it knows too much.',
-  },
-  {
-    id: 3,
-    image:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80',
-    caption: 'This still makes me laugh for no reason',
-    message: 'The best jokes are the ones that never fully leave your head.',
-  },
-  {
-    id: 4,
-    image:
-      'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=1200&q=80',
-    caption: 'A bit unhinged, but in a cute way',
-    message: 'This is the sort of chaos that makes the whole thing feel alive.',
-  },
-  {
-    id: 5,
-    image:
-      'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=1200&q=80',
-    caption: 'Okay, this was definitely you',
-    message: 'The "literally you" energy is strong with this one.',
-  },
-  {
-    id: 6,
-    image:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80',
-    caption: 'I regret nothing about this meme',
-    message: 'It lives rent-free now, and honestly that feels fair.',
-  },
-];
+function getMemeMessage(meme) {
+  const messageMap = {
+    wholesomememes:
+      'A soft little reminder that kind, silly things still count as a whole feeling.',
+    MadeMeSmile:
+      'This one feels like proof that the internet can still be sweet on purpose.',
+    aww: 'Cute enough to make the whole page feel a little warmer.',
+    Friendshipmemes:
+      'That specific group-chat energy where everyone is mildly ridiculous together.',
+  };
+
+  return messageMap[meme.subreddit] ?? 'A tiny joke with a lot more feeling underneath it.';
+}
+
+const memes = cachedMemes.map((meme) => ({
+  id: meme.id,
+  image: meme.imageUrl,
+  caption: meme.caption,
+  message: getMemeMessage(meme),
+  source: meme.source,
+  subreddit: meme.subreddit,
+  upvotes: meme.upvotes,
+}));
 
 export default function MemeSection() {
   const [selectedMeme, setSelectedMeme] = useState(null);
@@ -68,7 +48,7 @@ export default function MemeSection() {
       <PageCard
         eyebrow="Step 3"
         title="The meme corner"
-        description="Tap any meme to open a larger view, then let the captions do the rest."
+        description="These images are cached locally from wholesome public meme sources, so they load fast."
       >
         <div className="mb-6 flex justify-center">
           <button
@@ -151,9 +131,12 @@ export default function MemeSection() {
                 />
               </div>
 
-              <div className="px-2 pb-2 pt-5 text-center">
+                <div className="px-2 pb-2 pt-5 text-center">
                 <p className="text-lg font-semibold text-[#29183f]">{selectedMeme.caption}</p>
                 <p className="mt-3 text-sm leading-6 text-[#5f5870]">{selectedMeme.message}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.28em] text-[#9a84b5]">
+                  r/{selectedMeme.subreddit} · {selectedMeme.upvotes.toLocaleString()} upvotes
+                </p>
 
                 <button
                   type="button"
