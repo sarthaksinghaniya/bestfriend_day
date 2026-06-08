@@ -48,59 +48,6 @@ function getLinePause(line) {
   return linePauseMin + Math.round(ratio * (linePauseMax - linePauseMin));
 }
 
-function createAmbientAudio() {
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-
-  if (!AudioContextClass) {
-    return null;
-  }
-
-  const audioContext = new AudioContextClass();
-  const master = audioContext.createGain();
-  master.gain.value = 0.16;
-  master.connect(audioContext.destination);
-
-  const padA = audioContext.createOscillator();
-  const padB = audioContext.createOscillator();
-  const filter = audioContext.createBiquadFilter();
-  const lfo = audioContext.createOscillator();
-  const lfoGain = audioContext.createGain();
-
-  filter.type = 'lowpass';
-  filter.frequency.value = 720;
-  filter.Q.value = 0.55;
-
-  padA.type = 'sine';
-  padA.frequency.value = 174.61;
-  padB.type = 'triangle';
-  padB.frequency.value = 261.63;
-
-  lfo.type = 'sine';
-  lfo.frequency.value = 0.06;
-  lfoGain.gain.value = 85;
-
-  lfo.connect(lfoGain);
-  lfoGain.connect(filter.frequency);
-
-  padA.connect(filter);
-  padB.connect(filter);
-  filter.connect(master);
-
-  padA.start();
-  padB.start();
-  lfo.start();
-
-  return {
-    audioContext,
-    stop() {
-      lfo.stop();
-      padA.stop();
-      padB.stop();
-      audioContext.close().catch(() => undefined);
-    },
-  };
-}
-
 export default function Letter() {
   const navigate = useNavigate();
   const [visibleLines, setVisibleLines] = useState([]);
@@ -122,11 +69,6 @@ export default function Letter() {
   useEffect(() => {
     let cancelled = false;
     const timers = [];
-    const ambient = createAmbientAudio();
-
-    if (ambient) {
-      ambient.audioContext.resume().catch(() => undefined);
-    }
 
     async function revealLetter() {
       const nextLines = [];
@@ -183,7 +125,6 @@ export default function Letter() {
     return () => {
       cancelled = true;
       timers.forEach((timer) => window.clearTimeout(timer));
-      ambient?.stop();
     };
   }, []);
 

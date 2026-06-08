@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useName } from '../context/NameContext';
@@ -20,72 +20,6 @@ export default function Landing() {
       })),
     [],
   );
-
-  useEffect(() => {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-
-    if (!AudioContextClass) {
-      return undefined;
-    }
-
-    const audioContext = new AudioContextClass();
-    const master = audioContext.createGain();
-    master.gain.value = 0.035;
-    master.connect(audioContext.destination);
-
-    const oscillatorA = audioContext.createOscillator();
-    const oscillatorB = audioContext.createOscillator();
-    const lowPass = audioContext.createBiquadFilter();
-    const lfo = audioContext.createOscillator();
-    const lfoGain = audioContext.createGain();
-
-    lowPass.type = 'lowpass';
-    lowPass.frequency.value = 520;
-    lowPass.Q.value = 0.5;
-
-    oscillatorA.type = 'sine';
-    oscillatorA.frequency.value = 220;
-    oscillatorB.type = 'triangle';
-    oscillatorB.frequency.value = 330;
-
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.12;
-    lfoGain.gain.value = 80;
-
-    lfo.connect(lfoGain);
-    lfoGain.connect(lowPass.frequency);
-
-    oscillatorA.connect(lowPass);
-    oscillatorB.connect(lowPass);
-    lowPass.connect(master);
-
-    oscillatorA.start();
-    oscillatorB.start();
-    lfo.start();
-
-    const leadTimer = window.setInterval(() => {
-      oscillatorA.frequency.setTargetAtTime(
-        220 + (Math.random() > 0.5 ? 12 : -12),
-        audioContext.currentTime,
-        0.12,
-      );
-      oscillatorB.frequency.setTargetAtTime(
-        330 + (Math.random() > 0.5 ? 8 : -8),
-        audioContext.currentTime,
-        0.12,
-      );
-    }, 2200);
-
-    audioContext.resume().catch(() => undefined);
-
-    return () => {
-      window.clearInterval(leadTimer);
-      lfo.stop();
-      oscillatorA.stop();
-      oscillatorB.stop();
-      audioContext.close().catch(() => undefined);
-    };
-  }, []);
 
   return (
     <motion.section
@@ -154,7 +88,7 @@ export default function Landing() {
           transition={{ duration: 0.55, delay: 0.2 }}
           className="mx-auto mt-5 max-w-xl text-sm leading-6 text-[#5a506b] sm:text-base"
         >
-          A soft, floating little moment with memories, music, and a reveal waiting on the other side.
+          A soft, floating little moment with memories and a reveal waiting on the other side.
         </motion.p>
 
         <motion.button

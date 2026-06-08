@@ -9,65 +9,6 @@ const lines = [
   { text: 'And that scares me a little.', delay: 2500, size: 'text-2xl sm:text-3xl' },
 ];
 
-function createAmbientAudio() {
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-
-  if (!AudioContextClass) {
-    return null;
-  }
-
-  const audioContext = new AudioContextClass();
-  const master = audioContext.createGain();
-  master.gain.value = 0.2;
-  master.connect(audioContext.destination);
-
-  const padA = audioContext.createOscillator();
-  const padB = audioContext.createOscillator();
-  const padC = audioContext.createOscillator();
-  const filter = audioContext.createBiquadFilter();
-  const lfo = audioContext.createOscillator();
-  const lfoGain = audioContext.createGain();
-
-  filter.type = 'lowpass';
-  filter.frequency.value = 480;
-  filter.Q.value = 0.6;
-
-  padA.type = 'sine';
-  padA.frequency.value = 146.83;
-  padB.type = 'triangle';
-  padB.frequency.value = 220;
-  padC.type = 'sine';
-  padC.frequency.value = 293.66;
-
-  lfo.type = 'sine';
-  lfo.frequency.value = 0.05;
-  lfoGain.gain.value = 70;
-
-  lfo.connect(lfoGain);
-  lfoGain.connect(filter.frequency);
-
-  padA.connect(filter);
-  padB.connect(filter);
-  padC.connect(filter);
-  filter.connect(master);
-
-  padA.start();
-  padB.start();
-  padC.start();
-  lfo.start();
-
-  return {
-    audioContext,
-    stop() {
-      lfo.stop();
-      padA.stop();
-      padB.stop();
-      padC.stop();
-      audioContext.close().catch(() => undefined);
-    },
-  };
-}
-
 export default function PauseScreen() {
   const navigate = useNavigate();
   const [visibleLines, setVisibleLines] = useState([lines[0].text]);
@@ -75,12 +16,7 @@ export default function PauseScreen() {
   useEffect(() => {
     let cancelled = false;
     const timers = [];
-    const ambient = createAmbientAudio();
     const sequence = [lines[1], lines[2], lines[3]];
-
-    if (ambient) {
-      ambient.audioContext.resume().catch(() => undefined);
-    }
 
     let accumulatedDelay = lines[0].delay;
     sequence.forEach((line, index) => {
@@ -108,7 +44,6 @@ export default function PauseScreen() {
     return () => {
       cancelled = true;
       timers.forEach((timer) => window.clearTimeout(timer));
-      ambient?.stop();
     };
   }, [navigate]);
 
