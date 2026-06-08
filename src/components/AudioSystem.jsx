@@ -1,22 +1,39 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 const musicPath = '/assets/Music.mp3';
+let musicAudio = null;
+let musicStarted = false;
+
+function ensureMusicAudio() {
+  if (!musicAudio) {
+    musicAudio = new Audio(musicPath);
+    musicAudio.preload = 'auto';
+    musicAudio.loop = true;
+    musicAudio.volume = 0;
+    musicAudio.load();
+  }
+
+  return musicAudio;
+}
+
+export function startMusic() {
+  if (musicStarted) {
+    return;
+  }
+
+  musicStarted = true;
+  const audio = ensureMusicAudio();
+  void audio.play();
+}
 
 export default function AudioSystem() {
-  const audioRef = useRef(null);
-
   useEffect(() => {
-    const audio = new Audio(musicPath);
-
-    audio.preload = 'auto';
-    audio.loop = true;
-    audio.volume = 0;
-    audio.load();
-    audioRef.current = audio;
+    ensureMusicAudio();
 
     return () => {
-      audio.pause();
-      audioRef.current = null;
+      if (musicAudio) {
+        musicAudio.pause();
+      }
     };
   }, []);
 

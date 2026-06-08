@@ -3,12 +3,23 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import PageCard from '../components/PageCard';
 import SecondaryButton from '../components/SecondaryButton';
+import { startMusic } from '../components/AudioSystem';
 import { useName } from '../context/NameContext';
 
 export default function NameInput() {
   const navigate = useNavigate();
   const { setName } = useName();
   const [value, setValue] = useState('');
+
+  function handleChange(event) {
+    const nextValue = event.target.value;
+
+    setValue(nextValue);
+
+    if (nextValue.trim().length > 0) {
+      startMusic();
+    }
+  }
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -26,7 +37,7 @@ export default function NameInput() {
         <motion.input
           type="text"
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={handleChange}
           placeholder="Enter your name..."
           className="w-full rounded-full border border-[#dccfed] bg-white/80 px-5 py-3 text-center text-sm text-[#2a203e] outline-none transition placeholder:text-[#9b90b2] focus:border-[#a57fd0] focus:ring-4 focus:ring-[#cba7ef]/30"
           animate={{
