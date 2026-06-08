@@ -1,33 +1,133 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import PrimaryButton from '../components/PrimaryButton';
-import SecondaryButton from '../components/SecondaryButton';
+import { useNavigate } from 'react-router-dom';
 
 const letterLines = [
-  'Hey,',
-  'I do not know if I ever said this the right way,',
-  'but you made a lot of ordinary moments feel softer.',
-  'Some days I think I was quieter about it than I should have been.',
-  'Still, I always noticed.',
-  'And I think that mattered.',
+  'I don’t expect all your time…',
+  'I know life gets busy… and I understand that.',
+  '',
+  'But sometimes…',
+  'it hurts a little…',
+  'when I see you give that time to someone else…',
+  'and not me.',
+  '',
+  'I don’t want to force anything between us.',
+  'I don’t want something that isn’t real.',
+  '',
+  'I just… want you.',
+  'Not because I asked…',
+  'but because you chose me.',
+  '',
+  'I’ll stand by you… in everything.',
+  'Even on the days you don’t have time for me.',
+  '',
+  'But somewhere… quietly…',
+  'I just need your trust.',
+  'And maybe… a little more of your love.',
+  '',
+  'And if I already mean something to you…',
+  'then… be mine again.',
+  '',
+  'And if I don’t…',
+  '',
+  'Would you… be mine?',
 ];
 
-const lineDelay = 850;
-const charDelay = 26;
+const charDelay = 28;
+const linePauseMin = 500;
+const linePauseMax = 1000;
+
+function getLinePause(line) {
+  if (!line) {
+    return 650;
+  }
+
+  const clampedLength = Math.max(1, Math.min(80, line.length));
+  const ratio = clampedLength / 80;
+  return linePauseMin + Math.round(ratio * (linePauseMax - linePauseMin));
+}
+
+function createAmbientAudio() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+  if (!AudioContextClass) {
+    return null;
+  }
+
+  const audioContext = new AudioContextClass();
+  const master = audioContext.createGain();
+  master.gain.value = 0.16;
+  master.connect(audioContext.destination);
+
+  const padA = audioContext.createOscillator();
+  const padB = audioContext.createOscillator();
+  const filter = audioContext.createBiquadFilter();
+  const lfo = audioContext.createOscillator();
+  const lfoGain = audioContext.createGain();
+
+  filter.type = 'lowpass';
+  filter.frequency.value = 720;
+  filter.Q.value = 0.55;
+
+  padA.type = 'sine';
+  padA.frequency.value = 174.61;
+  padB.type = 'triangle';
+  padB.frequency.value = 261.63;
+
+  lfo.type = 'sine';
+  lfo.frequency.value = 0.06;
+  lfoGain.gain.value = 85;
+
+  lfo.connect(lfoGain);
+  lfoGain.connect(filter.frequency);
+
+  padA.connect(filter);
+  padB.connect(filter);
+  filter.connect(master);
+
+  padA.start();
+  padB.start();
+  lfo.start();
+
+  return {
+    audioContext,
+    stop() {
+      lfo.stop();
+      padA.stop();
+      padB.stop();
+      audioContext.close().catch(() => undefined);
+    },
+  };
+}
 
 export default function Letter() {
+  const navigate = useNavigate();
   const [visibleLines, setVisibleLines] = useState([]);
   const [activeLine, setActiveLine] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const timers = [];
+    const ambient = createAmbientAudio();
+
+    if (ambient) {
+      ambient.audioContext.resume().catch(() => undefined);
+    }
 
     async function revealLetter() {
       const nextLines = [];
 
       for (const line of letterLines) {
         let current = '';
+
+        if (!line) {
+          setVisibleLines([...nextLines, '']);
+          await new Promise((resolve) => {
+            timers.push(window.setTimeout(resolve, 650));
+          });
+          continue;
+        }
 
         for (const character of line) {
           if (cancelled) {
@@ -50,8 +150,12 @@ export default function Letter() {
         setActiveLine('');
 
         await new Promise((resolve) => {
-          timers.push(window.setTimeout(resolve, lineDelay));
+          timers.push(window.setTimeout(resolve, getLinePause(line)));
         });
+      }
+
+      if (!cancelled) {
+        setIsComplete(true);
       }
     }
 
@@ -60,45 +164,60 @@ export default function Letter() {
     return () => {
       cancelled = true;
       timers.forEach((timer) => window.clearTimeout(timer));
+      ambient?.stop();
     };
   }, []);
 
   return (
-    <section className="relative flex w-full max-w-4xl items-center justify-center overflow-hidden rounded-[2rem] border border-white/60 bg-white/22 px-5 py-12 shadow-[0_24px_80px_rgba(86,58,126,0.18)] backdrop-blur-2xl sm:px-8 sm:py-16">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.28),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(225,194,255,0.34),transparent_30%)]" />
-
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8">
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(233,214,255,0.35),transparent_30%)]" />
+      <div className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,rgba(9,8,16,0.94),rgba(38,23,56,0.88),rgba(96,62,136,0.7),rgba(231,217,255,0.2))] bg-[length:300%_300%] animate-[pause-shift_24s_ease-in-out_infinite]" />
       <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-2xl text-center"
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 opacity-30 blur-3xl"
+        animate={{
+          x: ['-5%', '5%', '-5%'],
+          y: ['-3%', '2%', '-3%'],
+          scale: [1, 1.04, 1],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#8f6ead]">
-          Step 5
-        </p>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#231635] sm:text-4xl">
-          A letter, slowly
-        </h1>
-        <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-[#5f5870] sm:text-base">
-          The words reveal themselves one line at a time, with just enough pause to let them land.
-        </p>
+        <div className="absolute left-[8%] top-[18%] h-80 w-80 rounded-full bg-fuchsia-500/20" />
+        <div className="absolute right-[10%] top-[16%] h-96 w-96 rounded-full bg-violet-400/20" />
+        <div className="absolute bottom-[10%] left-[28%] h-72 w-72 rounded-full bg-pink-300/10" />
+      </motion.div>
 
-        <div className="relative mx-auto mt-10 overflow-hidden rounded-[2rem] border border-white/75 bg-[#fffafc]/75 p-6 text-left shadow-[0_18px_60px_rgba(86,58,126,0.14)] backdrop-blur-2xl sm:p-8">
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.45),transparent_35%,rgba(255,255,255,0.16)_60%,transparent)] opacity-70" />
-          <div className="relative z-10 min-h-[16rem] text-center text-[0.98rem] leading-8 text-[#46395f] sm:text-[1.02rem] sm:leading-9">
+      <section className="w-full max-w-4xl text-center">
+        <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/5 px-5 py-10 shadow-[0_24px_80px_rgba(0,0,0,0.22)] backdrop-blur-2xl sm:px-10 sm:py-14">
+          <p className="text-xs font-semibold uppercase tracking-[0.45em] text-white/35">
+            Letter
+          </p>
+
+          <div className="mx-auto mt-8 max-w-2xl text-center text-white">
             <AnimatePresence mode="wait">
-              {visibleLines.map((line, index) => (
-                <motion.p
-                  key={`${index}-${line}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.45, ease: 'easeOut' }}
-                  className="mb-2"
-                >
-                  {line}
-                </motion.p>
-              ))}
+              {visibleLines.map((line, index) => {
+                const isFinalBlank = line === '';
+                const lineKey = `${index}-${line}`;
+
+                return (
+                  <motion.p
+                    key={lineKey}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.75, ease: 'easeOut' }}
+                    className={`mx-auto text-balance ${
+                      isFinalBlank ? 'h-3' : 'mb-2'
+                    } ${index >= 23 ? 'text-2xl sm:text-3xl' : 'text-2xl sm:text-4xl'} ${
+                      index === 3 || index === 4 || index === 5 || index === 6
+                        ? 'font-medium'
+                        : 'font-light'
+                    }`}
+                  >
+                    {line}
+                  </motion.p>
+                );
+              })}
             </AnimatePresence>
 
             {activeLine ? (
@@ -106,20 +225,37 @@ export default function Letter() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }}
-                className="mb-2 inline-block min-h-[1.8rem]"
+                className="mx-auto inline-block min-h-[1.8rem] text-2xl font-light text-white sm:text-4xl"
               >
                 {activeLine}
                 <span className="ml-1 inline-block animate-pulse">|</span>
               </motion.p>
             ) : null}
           </div>
-        </div>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <PrimaryButton to="/final">Reveal</PrimaryButton>
-          <SecondaryButton to="/pause">Back</SecondaryButton>
+          <AnimatePresence>
+            {isComplete ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="mt-10 flex justify-center"
+              >
+                <motion.button
+                  type="button"
+                  onClick={() => navigate('/final')}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-medium text-white/95 backdrop-blur-xl transition hover:bg-white/15"
+                >
+                  Continue…
+                </motion.button>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </div>
-      </motion.div>
-    </section>
+      </section>
+    </main>
   );
 }
