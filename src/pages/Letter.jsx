@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,6 +36,7 @@ const letterLines = [
 const charDelay = 28;
 const linePauseMin = 500;
 const linePauseMax = 1000;
+const typingStartDelay = 1000;
 
 function getLinePause(line) {
   if (!line) {
@@ -105,6 +106,18 @@ export default function Letter() {
   const [visibleLines, setVisibleLines] = useState([]);
   const [activeLine, setActiveLine] = useState('');
   const [isComplete, setIsComplete] = useState(false);
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 16 }, (_, index) => ({
+        id: index,
+        left: `${(index * 17 + 9) % 100}%`,
+        top: `${(index * 11 + 13) % 100}%`,
+        size: 4 + (index % 3),
+        delay: index * 0.35,
+        duration: 10 + (index % 5) * 2,
+      })),
+    [],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -159,7 +172,13 @@ export default function Letter() {
       }
     }
 
-    revealLetter();
+    timers.push(
+      window.setTimeout(() => {
+        if (!cancelled) {
+          revealLetter();
+        }
+      }, typingStartDelay),
+    );
 
     return () => {
       cancelled = true;
@@ -172,6 +191,7 @@ export default function Letter() {
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8">
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(233,214,255,0.35),transparent_30%)]" />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,rgba(9,8,16,0.94),rgba(38,23,56,0.88),rgba(96,62,136,0.7),rgba(231,217,255,0.2))] bg-[length:300%_300%] animate-[pause-shift_24s_ease-in-out_infinite]" />
+
       <motion.div
         aria-hidden="true"
         className="absolute inset-0 -z-10 opacity-30 blur-3xl"
@@ -187,7 +207,39 @@ export default function Letter() {
         <div className="absolute bottom-[10%] left-[28%] h-72 w-72 rounded-full bg-pink-300/10" />
       </motion.div>
 
-      <section className="w-full max-w-4xl text-center">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        {particles.map((particle) => (
+          <motion.span
+            key={particle.id}
+            className="absolute rounded-full bg-white/40"
+            style={{
+              left: particle.left,
+              top: particle.top,
+              width: particle.size,
+              height: particle.size,
+            }}
+            animate={{
+              opacity: [0.08, 0.28, 0.08],
+              y: [0, -10, 0],
+              x: [0, 6, 0],
+              scale: [1, 1.16, 1],
+            }}
+            transition={{
+              duration: particle.duration,
+              delay: particle.delay,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+
+      <motion.section
+        initial={{ opacity: 0, scale: 1 }}
+        animate={{ opacity: 1, scale: 1.05 }}
+        transition={{ duration: 18, ease: 'easeInOut' }}
+        className="w-full max-w-4xl text-center"
+      >
         <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/5 px-5 py-10 shadow-[0_24px_80px_rgba(0,0,0,0.22)] backdrop-blur-2xl sm:px-10 sm:py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-white/35">
             Letter
@@ -255,7 +307,7 @@ export default function Letter() {
             ) : null}
           </AnimatePresence>
         </div>
-      </section>
+      </motion.section>
     </main>
   );
 }
