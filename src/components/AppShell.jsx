@@ -2,10 +2,12 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const steps = [
-  { label: 'Landing', path: '/' },
-  { label: 'NameInput', path: '/name-input' },
+  { label: 'NameInput', path: '/' },
+  { label: 'Landing', path: '/start' },
+  { label: 'QuestionsFlow', path: '/questions' },
+  { label: 'PauseScreen', path: '/pause' },
   { label: 'Letter', path: '/letter' },
-  { label: 'NicknameReveal', path: '/nickname-reveal' },
+  { label: 'NicknameReveal', path: '/final' },
 ];
 
 export default function AppShell() {

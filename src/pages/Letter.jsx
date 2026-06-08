@@ -116,8 +116,8 @@ export default function Letter() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <PrimaryButton to="/nickname-reveal">Reveal</PrimaryButton>
-          <SecondaryButton to="/name-input">Back</SecondaryButton>
+          <PrimaryButton to="/final">Reveal</PrimaryButton>
+          <SecondaryButton to="/pause">Back</SecondaryButton>
         </div>
       </motion.div>
     </section>

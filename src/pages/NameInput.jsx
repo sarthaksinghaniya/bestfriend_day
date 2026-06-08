@@ -13,7 +13,7 @@ export default function NameInput() {
   function handleSubmit(event) {
     event.preventDefault();
     setName(value.trim());
-    navigate('/');
+    navigate('/start');
   }
 
   return (
@@ -63,7 +63,7 @@ export default function NameInput() {
         </motion.button>
 
         <div className="flex justify-center">
-          <SecondaryButton to="/">Back</SecondaryButton>
+          <SecondaryButton to="/start">Back</SecondaryButton>
         </div>
       </form>
     </PageCard>

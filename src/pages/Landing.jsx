@@ -159,7 +159,7 @@ export default function Landing() {
 
         <motion.button
           type="button"
-          onClick={() => navigate(name ? '/letter' : '/name-input')}
+          onClick={() => navigate('/questions')}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.3 }}
