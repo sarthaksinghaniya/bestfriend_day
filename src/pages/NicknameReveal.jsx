@@ -36,6 +36,10 @@ function buildConfettiPieces() {
   }));
 }
 
+function shouldHighlightAnswer(answer) {
+  return answer.includes('Yes') || answer.includes('Of course I do');
+}
+
 export default function NicknameReveal() {
   const { answers } = useAnswers();
   const captureRef = useRef(null);
@@ -225,19 +229,33 @@ export default function NicknameReveal() {
                 </h2>
 
                 <div className="mt-5 space-y-4">
-                  {answers.map((item, index) => (
-                    <div
-                      key={`${item.question}-${index}`}
-                      className="rounded-2xl border border-[#eadff4] bg-[#fffafc]/80 px-4 py-4 shadow-[0_10px_28px_rgba(86,58,126,0.08)]"
-                    >
-                      <p className="text-sm font-medium leading-6 text-[#35264d]">
-                        {item.question}
-                      </p>
-                      <p className="mt-3 border-l-2 border-[#c79adb] pl-3 text-sm leading-6 text-[#7a5a92]">
-                        → {item.answer}
-                      </p>
-                    </div>
-                  ))}
+                  {answers.map((item, index) => {
+                    const isHighlighted = shouldHighlightAnswer(item.answer);
+
+                    return (
+                      <div
+                        key={`${item.question}-${index}`}
+                        className={`rounded-2xl border px-4 py-4 transition ${
+                          isHighlighted
+                            ? 'border-[#e8c5e8] bg-[#fff9fd] shadow-[0_0_26px_rgba(216,127,182,0.22),0_10px_28px_rgba(86,58,126,0.08)]'
+                            : 'border-[#eadff4] bg-[#fffafc]/80 shadow-[0_10px_28px_rgba(86,58,126,0.08)]'
+                        }`}
+                      >
+                        <p className="text-sm font-medium leading-6 text-[#35264d]">
+                          {item.question}
+                        </p>
+                        <p
+                          className={`mt-3 border-l-2 pl-3 text-sm leading-6 ${
+                            isHighlighted
+                              ? 'border-[#d77fb6] font-medium text-[#6f3f79]'
+                              : 'border-[#c79adb] text-[#7a5a92]'
+                          }`}
+                        >
+                          → {item.answer}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </motion.div>
             ) : null}
