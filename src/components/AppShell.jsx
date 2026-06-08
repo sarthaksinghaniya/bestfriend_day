@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import AudioSystem from './AudioSystem';
 
 const steps = [
@@ -54,14 +54,20 @@ export default function AppShell() {
           </nav>
         ) : null}
 
-        <motion.section
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="flex flex-1 items-center justify-center"
-        >
-          <Outlet />
-        </motion.section>
+        <div className="flex flex-1 items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.38, ease: 'easeOut' }}
+              className="w-full"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       <div className="pointer-events-none fixed bottom-4 left-1/2 z-20 -translate-x-1/2">

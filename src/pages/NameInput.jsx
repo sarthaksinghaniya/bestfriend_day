@@ -24,14 +24,14 @@ export default function NameInput() {
   function handleSubmit(event) {
     event.preventDefault();
     setName(value.trim());
-    navigate('/start');
+    navigate('/wish');
   }
 
   return (
     <PageCard
       eyebrow="Step 1"
       title="What should we call you?"
-      description="Enter your name and continue back to the Landing page with it saved globally."
+      description="Enter your name and I’ll take you straight to the letter."
     >
       <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-sm flex-col gap-3">
         <motion.input
